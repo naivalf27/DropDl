@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.get('/', function(request, response) {
   const results = [];
   // Get a Postgres client from the connection pool
-  pg.connect(connectionString, (err, client, done) => {
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
     if(err) {
       done();
