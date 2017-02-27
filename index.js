@@ -93,6 +93,7 @@ app.post('/login', function (request, response) {
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
+      console.log(results);
       return response.json(results);
       // if (results.count == 0) {
       //   response.send("Error this name doesn't exist");
