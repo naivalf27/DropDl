@@ -3,7 +3,8 @@ var express = require('express');
 var pg = require('pg');
 
 // Nécessaire pour laisser Heroku contrôler le port
-var port = process.env.PORT || 8080;
+//var port = process.env.PORT || 8080;
+app.set('port', (process.env.PORT || 8080))
 
 var app = express();
 
@@ -11,6 +12,10 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get('/', function(request, response) {
+  response.send('Hello World!')
+})
 
 app.post('/login', function (request, response) {
   console.log('debut de la methode login');
