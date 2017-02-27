@@ -39,11 +39,11 @@ app.get('/', function(request, response) {
 
 app.post('/add', function (request, response) {
   var message = {
-        _name: request.body._name,
-        _password: request.body._password,
-        _email:request.body._email
+        'name': request.body._name,
+        'password': request.body._password,
+        'email':request.body._email
     };
-    console.log(message);
+    console.log(request.body);
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
     if(err) {
@@ -52,7 +52,7 @@ app.post('/add', function (request, response) {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    client.query('INSERT INTO users(name,password,email) values($1, $2, $3);',[message._name, message._password, message._email]);
+    client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
 
     const query = client.query('SELECT * FROM users ORDER BY id ASC;');
     // Stream results back one row at a time
