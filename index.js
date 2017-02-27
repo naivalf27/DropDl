@@ -73,8 +73,8 @@ app.post('/add', function (request, response) {
 app.post('/login', function (request, response) {
   const results = [];
   var message = {
-        'name': request.body.name_user,
-        'password': request.body.password_user
+        'name': request.body._name,
+        'password': request.body._password
     };
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
@@ -93,7 +93,12 @@ app.post('/login', function (request, response) {
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
-      return response.json(results);
+      if results.count == 0 {
+        response.send("Error this name doesn't exist");
+        return response.status(400);
+      } else if (results.count == 1) {
+        return response.json(results);
+      }
     });
   });
 
