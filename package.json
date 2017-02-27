@@ -1,0 +1,25 @@
+{
+  "name": "dropdl",
+  "version": "1.0.0",
+  "description": "Server for DropDl",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naivalf27/DropDl.git"
+  },
+  "author": "Naivalf27",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naivalf27/DropDl/issues"
+  },
+  "homepage": "https://github.com/naivalf27/DropDl#readme",
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "express": "^4.14.1",
+    "pg": "^6.1.2",
+    "sqlite3": "^3.1.8"
+  }
+}
