@@ -24,7 +24,7 @@ app.get('/', function(request, response) {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT * FROM user_table ORDER BY id ASC;');
+    const query = client.query('SELECT * FROM users ORDER BY id ASC;');
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
@@ -33,6 +33,34 @@ app.get('/', function(request, response) {
     query.on('end', () => {
       done();
       return response.json(results);
+    });
+  });
+});
+
+app.post('/add', function (request, response) {
+  var message = {
+        'name': request.body._name,
+        'password': request.body._password,
+        'email':request.body._email
+    };
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+    // SQL Query > Select Data
+    const query = client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
+
+    // Stream results back one row at a time
+    // query.on('row', (row) => {
+    //   results.push(row);
+    // });
+    // After all data is returned, close connection and return results
+    query.on('end', () => {
+      done();
+      return response.send("INSERT OK");
     });
   });
 });
@@ -46,7 +74,7 @@ app.post('/login', function (request, response) {
 
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
     console.log('debut de la methode de connection');
-    client.query('SELECT * FROM user_table WHERE user_table.name ='+message['name'], function(err, result) {
+    client.query('SELECT * FROM user_table WHERE users.name ='+message['name'], function(err, result) {
       done();
       if (err) {
         console.error(err); 
