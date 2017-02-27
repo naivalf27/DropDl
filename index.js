@@ -51,7 +51,7 @@ app.post('/add', function (request, response) {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
+    const query = client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES ('+message['name']+','+message['password']+','+message['email']+');');
 
     // Stream results back one row at a time
     // query.on('row', (row) => {
