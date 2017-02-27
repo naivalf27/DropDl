@@ -104,28 +104,6 @@ app.post('/login', function (request, response) {
       }
     });
   });
-
-
-
-
-  //   client.query('SELECT * FROM user_table WHERE users.name ='+message['name'], function(err, result) {
-  //     done();
-  //     if (err) {
-  //       console.error(err); 
-  //       response.send("Error " + err);
-  //       response.status(400);
-  //     } else { 
-  //       if (result.rows.count == 1) {
-  //         if (result.rows[0].password == message['password']) {
-  //         // response.setHeader('Content-Type', 'application/json');
-  //           response.status(200);
-  //         }
-  //       }
-  //       response.status(401);
-  //       response.render('pages/db', {results: result.rows} ); }
-  //     });
-  // });
-  // console.log('fin de la methode login');
 });
 
 // Route affichant le contenu complet de la base de données
