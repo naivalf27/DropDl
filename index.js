@@ -93,14 +93,12 @@ app.post('/login', function (request, response) {
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
-      console.log(results.length);
-      return response.json(results);
-      // if (results.count == 0) {
-      //   response.send("Error this name doesn't exist");
-      //   return response.status(400);
-      // } else if (results.count == 1) {
-      //   return response.json(results);
-      // }
+      if (results.length == 0) {
+        response.send("Error this name doesn't exist");
+        return response.status(400);
+      } else if (results.length == 1) {
+        return response.json(results);
+      }
     });
   });
 
