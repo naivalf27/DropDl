@@ -26,7 +26,7 @@ app.post('/login', function (request, response) {
 
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
     console.log('debut de la methode de connection');
-    client.query('SELECT * FROM user_table WHERE name ='+message['name'], function(err, result) {
+    client.query('SELECT * FROM user_table WHERE user_table.name ='+message['name'], function(err, result) {
       done();
       if (err) {
         console.error(err); 
