@@ -39,9 +39,9 @@ app.get('/', function(request, response) {
 
 app.post('/add', function (request, response) {
   var message = {
-        'name': request.body._name,
-        'password': request.body._password,
-        'email':request.body._email
+        name: request.body._name,
+        password: request.body._password,
+        email:request.body._email
     };
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
@@ -51,16 +51,17 @@ app.post('/add', function (request, response) {
       return res.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES ('+message['name']+','+message['password']+','+message['email']+');');
+    client.query('INSERT INTO users (name,password,email) values($1, $2, $3);',[message.name, message.password, message.email]);
 
+    const query = client.query('SELECT * FROM users ORDER BY id ASC;');
     // Stream results back one row at a time
-    // query.on('row', (row) => {
-    //   results.push(row);
-    // });
+    query.on('row', (row) => {
+      results.push(row);
+    });
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
-      return response.send("INSERT OK");
+      return response.json(results);
     });
   });
 });
