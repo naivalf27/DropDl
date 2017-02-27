@@ -38,6 +38,7 @@ app.get('/', function(request, response) {
 });
 
 app.post('/add', function (request, response) {
+  const results = [];
   var message = {
         'name': request.body._name,
         'password': request.body._password,
