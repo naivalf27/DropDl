@@ -13,13 +13,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/login', function (request, response) {
-
+  console.log('debut de la methode login');
   var message = {
         'name': request.body.name_user,
         'password': request.body.password_user
     };
 
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+    console.log('debut de la methode de connection');
     client.query('SELECT * FROM user_table WHERE name ='+message['name'], function(err, result) {
       done();
       if (err) {
@@ -37,6 +38,7 @@ app.post('/login', function (request, response) {
         response.render('pages/db', {results: result.rows} ); }
       });
   });
+  console.log('fin de la methode login');
 });
 
 // Route affichant le contenu complet de la base de données
