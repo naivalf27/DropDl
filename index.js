@@ -1,3 +1,6 @@
+// Création des tables 
+// CREATE TABLE users ( ID SERIAL PRIMARY KEY, NAME TEXT NOT NULL, PASSWORD TEXT NOT NULL, EMAIL TEXT NOT NULL);
+
 // Dépendances
 var express = require('express');
 var pg = require('pg');
@@ -44,7 +47,6 @@ app.post('/add', function (request, response) {
         'password': request.body._password,
         'email':request.body._email
     };
-    console.log(request.body);
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
     if(err) {
@@ -52,7 +54,7 @@ app.post('/add', function (request, response) {
       console.log(err);
       return res.status(500).json({success: false, data: err});
     }
-    // SQL Query > Select Data
+    // SQL Query > Insert Data
     client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
 
     const query = client.query('SELECT * FROM users ORDER BY id ASC;');
@@ -69,32 +71,53 @@ app.post('/add', function (request, response) {
 });
 
 app.post('/login', function (request, response) {
-  console.log('debut de la methode login');
+  const results = [];
   var message = {
         'name': request.body.name_user,
         'password': request.body.password_user
     };
-
-  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-    console.log('debut de la methode de connection');
-    client.query('SELECT * FROM user_table WHERE users.name ='+message['name'], function(err, result) {
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
       done();
-      if (err) {
-        console.error(err); 
-        response.send("Error " + err);
-        response.status(400);
-      } else { 
-        if (result.rows.count == 1) {
-          if (result.rows[0].password == message['password']) {
-          // response.setHeader('Content-Type', 'application/json');
-            response.status(200);
-          }
-        }
-        response.status(401);
-        response.render('pages/db', {results: result.rows} ); }
-      });
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+
+    // SQL Query > Select Data
+    const query = client.query('SELECT * FROM users WHERE users.NAME=\''+message['name']+'\';');
+    // Stream results back one row at a time
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    // After all data is returned, close connection and return results
+    query.on('end', () => {
+      done();
+      return response.json(results);
+    });
   });
-  console.log('fin de la methode login');
+
+
+
+
+  //   client.query('SELECT * FROM user_table WHERE users.name ='+message['name'], function(err, result) {
+  //     done();
+  //     if (err) {
+  //       console.error(err); 
+  //       response.send("Error " + err);
+  //       response.status(400);
+  //     } else { 
+  //       if (result.rows.count == 1) {
+  //         if (result.rows[0].password == message['password']) {
+  //         // response.setHeader('Content-Type', 'application/json');
+  //           response.status(200);
+  //         }
+  //       }
+  //       response.status(401);
+  //       response.render('pages/db', {results: result.rows} ); }
+  //     });
+  // });
+  // console.log('fin de la methode login');
 });
 
 // Route affichant le contenu complet de la base de données
