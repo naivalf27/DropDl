@@ -99,7 +99,7 @@ app.post('/login', function (request, response) {
         if (results[0].password == message['password']) {
           return response.json(results[0]);
         } else {
-          return response.status(401).send("Error this name doesn't exist");
+          return response.status(401).send("Error password");
         }
       }
     });
