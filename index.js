@@ -15,36 +15,36 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', function(request, response) {
   response.send('Hello World!')
-})
-
-app.post('/login', function (request, response) {
-  console.log('debut de la methode login');
-  var message = {
-        'name': request.body.name_user,
-        'password': request.body.password_user
-    };
-
-  pg.connect(process.env.DATABASE_URL, function(err, client, done) {
-    console.log('debut de la methode de connection');
-    client.query('SELECT * FROM user_table WHERE name ='+message['name'], function(err, result) {
-      done();
-      if (err) {
-        console.error(err); 
-        response.send("Error " + err);
-        response.status(400);
-      } else { 
-        if (result.rows.count == 1) {
-          if (result.rows[0].password == message['password']) {
-          // response.setHeader('Content-Type', 'application/json');
-            response.status(200);
-          }
-        }
-        response.status(401);
-        response.render('pages/db', {results: result.rows} ); }
-      });
-  });
-  console.log('fin de la methode login');
 });
+
+// app.post('/login', function (request, response) {
+//   console.log('debut de la methode login');
+//   var message = {
+//         'name': request.body.name_user,
+//         'password': request.body.password_user
+//     };
+
+//   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
+//     console.log('debut de la methode de connection');
+//     client.query('SELECT * FROM user_table WHERE name ='+message['name'], function(err, result) {
+//       done();
+//       if (err) {
+//         console.error(err); 
+//         response.send("Error " + err);
+//         response.status(400);
+//       } else { 
+//         if (result.rows.count == 1) {
+//           if (result.rows[0].password == message['password']) {
+//           // response.setHeader('Content-Type', 'application/json');
+//             response.status(200);
+//           }
+//         }
+//         response.status(401);
+//         response.render('pages/db', {results: result.rows} ); }
+//       });
+//   });
+//   console.log('fin de la methode login');
+// });
 
 // Route affichant le contenu complet de la base de données
 // app.get('/', function(req, res) {
@@ -103,8 +103,7 @@ app.post('/login', function (request, response) {
 //     res.setHeader('Content-Type', 'application/json');
 //     res.status(201).json(message);
 // });
-
-// // Lancement de l'app
-// app.listen(port, function() {
-//     console.log("Running on port " + port);
-// });
+// Lancement de l'app
+app.listen(app.get('port'), function() {
+  console.log("Node app is running at localhost:" + app.get('port'))
+});
