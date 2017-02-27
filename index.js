@@ -2,11 +2,11 @@
 var express = require('express');
 var pg = require('pg');
 
+var app = express();
+
 // Nécessaire pour laisser Heroku contrôler le port
 //var port = process.env.PORT || 8080;
 app.set('port', (process.env.PORT || 8080))
-
-var app = express();
 
 // Nécessaire pour parser les requêtes POST
 var bodyParser = require('body-parser');
