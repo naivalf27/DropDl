@@ -96,6 +96,7 @@ app.post('/login', function (request, response) {
       if (results.length == 0) {
         return response.status(400).send("Error this name doesn't exist");
       } else if (results.length == 1) {
+        console.log(results);
         return response.json(results);
       }
     });
