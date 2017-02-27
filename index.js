@@ -1,3 +1,6 @@
+// Open Heroku postgres : 
+// heroku pg:psql --app dropdl
+
 // Création des tables 
 // CREATE TABLE users ( ID SERIAL PRIMARY KEY, NAME TEXT NOT NULL, PASSWORD TEXT NOT NULL, EMAIL TEXT NOT NULL);
 
