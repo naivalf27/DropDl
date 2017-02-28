@@ -153,7 +153,7 @@ app.post('/add/request', function (request, response) {
         // After all data is returned, close connection and return results
         query.on('end', () => {
           done();
-          return response.json(results);
+          return response.json(results[0]);
         });
       }
     });
