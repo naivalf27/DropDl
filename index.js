@@ -174,7 +174,7 @@ app.get('/requests', function(request, response) {
     }
     // SQL Query > Select Data
     // SELECT A.*, (SELECT COUNT(*) FROM B WHERE B.a_id = A.id) AS TOT FROM A
-    const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS TOT FROM requests;');
+    const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER FROM requests;');
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
