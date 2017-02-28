@@ -137,7 +137,7 @@ app.post('/add/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    console.log('request name : '+toHex(message['name']);
+    console.log('request name : '+toHex(message['name']));
 
     const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+message['name'].toString('hex')+'\',\''+message['comment'].toString('hex')+'\') RETURNING ID;', [], function(err,result) {
       if(err) {
@@ -236,4 +236,4 @@ function toHex(str) {
     hex += ''+str.charCodeAt(i).toString(16);
   }
   return hex;
-}
+};
