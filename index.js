@@ -137,9 +137,7 @@ app.post('/add/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    console.log('request name : '+toHex(message['name']));
-
-    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+message['name'].toString('hex')+'\',\''+message['comment'].toString('hex')+'\') RETURNING ID;', [], function(err,result) {
+    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+toHex(message['name'])+'\',\''+toHex(message['comment'])+'\') RETURNING ID;', [], function(err,result) {
       if(err) {
         console.log('Error insert request : '+err);
       } else {
