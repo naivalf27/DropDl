@@ -140,29 +140,23 @@ app.post('/add/request', function (request, response) {
     const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+toHex(message['name'])+'\',\''+toHex(message['comment'])+'\') RETURNING ID;', [], function(err,result) {
       if(err) {
         console.log('Error insert request : '+err);
+        return response.status(440).send("Error insert Request");
       } else {
         requestId = result.rows[0].id;
-        console.log('Request Inserted: '+requestId);
+        client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ('+message['user_id']+','+requestId+','+message['date']+');');
+
+        const query = client.query('SELECT * FROM requests WHERE requests.ID='+requestId+';');
+        // Stream results back one row at a time
+        query.on('row', (row) => {
+          results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', () => {
+          done();
+          return response.json(results);
+        });
       }
     });
-
-    if (requestId > 0) {
-      // SQL Query > Insert Data
-      client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ('+message['user_id']+','+requestId+','+message['date']+');');
-
-      const query = client.query('SELECT * FROM requests WHERE requests.ID='+requestId+';');
-      // Stream results back one row at a time
-      query.on('row', (row) => {
-        results.push(row);
-      });
-      // After all data is returned, close connection and return results
-      query.on('end', () => {
-        done();
-        return response.json(results);
-      });
-    } else {
-      return response.status(440).json({success: false, data: err});
-    }
   });
 });
 
