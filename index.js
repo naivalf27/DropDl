@@ -153,6 +153,8 @@ app.post('/add/request', function (request, response) {
         // After all data is returned, close connection and return results
         query.on('end', () => {
           done();
+          results[0].name = toString(results[0].name);
+          results[0].comment = toString(results[0].comment);
           return response.json(results[0]);
         });
       }
@@ -228,4 +230,11 @@ function toHex(str) {
     hex += ''+str.charCodeAt(i).toString(16);
   }
   return hex;
+};
+function toString(hexx) {
+    var hex = hexx.toString();//force conversion
+    var str = '';
+    for (var i = 0; i < hex.length; i += 2)
+        str += String.fromCharCode(parseInt(hex.substr(i, 2), 16));
+    return str;
 };
