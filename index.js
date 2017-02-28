@@ -37,7 +37,7 @@ app.get('/', function(request, response) {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
     const query = client.query('SELECT * FROM users ORDER BY id ASC;');
@@ -65,7 +65,7 @@ app.post('/add/user', function (request, response) {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Data
     client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
@@ -94,7 +94,7 @@ app.post('/login', function (request, response) {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return response.status(500).json({success: false, data: err});
     }
 
     // SQL Query > Select Data
@@ -134,9 +134,10 @@ app.post('/add/request', function (request, response) {
     if(err) {
       done();
       console.log(err);
-      return res.status(500).json({success: false, data: err});
+      return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
+    console.log('request name : '+message['name'].toString('hex'));
     const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+message['name'].toString('hex')+'\',\''+message['comment'].toString('hex')+'\') RETURNING ID;', [], function(err,result) {
       if(err) {
         console.log('Error insert request : '+err);
@@ -145,7 +146,7 @@ app.post('/add/request', function (request, response) {
         console.log('Request Inserted: '+requestId);
       }
     });
-    
+
     if (requestId > 0) {
       // SQL Query > Insert Data
       client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ('+message['user_id']+','+requestId+','+message['date']+');');
@@ -160,6 +161,8 @@ app.post('/add/request', function (request, response) {
         done();
         return response.json(results);
       });
+    } else {
+      return response.status(440).json({success: false, data: err});
     }
   });
 });
