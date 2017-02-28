@@ -3,6 +3,16 @@
 
 // Création des tables 
 // CREATE TABLE users ( ID SERIAL PRIMARY KEY, NAME TEXT NOT NULL, PASSWORD TEXT NOT NULL, EMAIL TEXT NOT NULL);
+// CREATE TABLE requests ( ID SERIAL PRIMARY KEY, TYPE_ID INTEGER NOT NULL, NAME TEXT NOT NULL, COMMENT TEXT NOT NULL, DOWNLOADED_AT INTEGER);
+// CREATE TABLE request_to_users ( ID SERIAL PRIMARY KEY, USER_ID INTEGER NOT NULL, REQUEST_ID INTEGER NOT NULL, ASKED_AT INTEGER NOT NULL);
+// CREATE TABLE types ( ID SERIAL PRIMARY KEY, NAME TEXT NOT NULL);
+
+// Init types :
+// INSERT INTO types (NAME) VALUES ('Film');
+// INSERT INTO types (NAME) VALUES ('Série');
+// INSERT INTO types (NAME) VALUES ('Musique');
+// INSERT INTO types (NAME) VALUES ('Logiciel');
+// INSERT INTO types (NAME) VALUES ('Autre');
 
 // Dépendances
 var express = require('express');
@@ -43,7 +53,7 @@ app.get('/', function(request, response) {
   });
 });
 
-app.post('/add', function (request, response) {
+app.post('/add/user', function (request, response) {
   const results = [];
   var message = {
         'name': request.body._name,
@@ -105,6 +115,48 @@ app.post('/login', function (request, response) {
           return response.status(401).send("Error password");
         }
       }
+    });
+  });
+});
+
+app.post('/add/request', function (request, response) {
+  const results = [];
+  var requestId = 0;
+  var message = {
+        'user_id': request.body._user_id,
+        'type_id': request.body._type_id,
+        'name': request.body._name,
+        'comment': request.body._comment,
+        'date':request.body._date
+    };
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+    // SQL Query > Insert Request
+    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+message['name']+'\',\''+message['comment']+'\') RETURNING ID;', [], function(err,result) {
+      if(err) {
+
+      } else {
+        requestId = result.rows[0].id;
+      }
+    });
+
+    // SQL Query > Insert Data
+    client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ('+message['user_id']+','+requestId+','+message['date']+');');
+
+    const query = client.query('SELECT * FROM requests WHERE requests.ID='+requestId+';');
+    // Stream results back one row at a time
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    // After all data is returned, close connection and return results
+    query.on('end', () => {
+      done();
+      return response.json(results);
     });
   });
 });
