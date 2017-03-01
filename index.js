@@ -143,9 +143,9 @@ app.post('/add/request', function (request, response) {
         return response.status(440).send("Error insert Request");
       } else {
         requestId = result.rows[0].id;
-        client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ('+message['user_id']+','+requestId+','+message['date']+');');
+        client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],requestId,message['date']]);
 
-        const query = client.query('SELECT * FROM requests WHERE requests.ID='+requestId+';');
+        const query = client.query('SELECT * FROM requests WHERE requests.ID=$1;',[requestId]);
         // Stream results back one row at a time
         query.on('row', (row) => {
           results.push(row);
@@ -153,8 +153,6 @@ app.post('/add/request', function (request, response) {
         // After all data is returned, close connection and return results
         query.on('end', () => {
           done();
-          results[0].name = toString(results[0].name);
-          results[0].comment = toString(results[0].comment);
           return response.json(results[0]);
         });
       }
