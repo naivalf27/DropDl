@@ -163,6 +163,7 @@ app.post('/add/request', function (request, response) {
 app.get('/requests', function(request, response) {
   const results = [];
   // Get a Postgres client from the connection pool
+  console.log(request.url);
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
     if(err) {
