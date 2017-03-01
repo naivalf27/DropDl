@@ -148,6 +148,34 @@ app.post('/up/request', function (request, response) {
   });
 });
 
+app.post('/down/request', function (request, response) {
+  const results = [];
+  var requestId = 0;
+  var message = {
+        'user_id': request.body._user_id,
+        'request_id': request.body._request_id
+    };
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log(err);
+      return response.status(500).json({success: false, data: err});
+    }
+    // SQL Query > Insert Request
+    const query = client.query('DELETE FROM request_to_users WHERE request_to_users.USER_ID = $1 AND request_to_users.REQUEST_ID = $2;',[message['user_id'],message['request_id']], function(err,result) {
+      if(err) {
+        done();
+        console.log('Error insert request : '+err);
+        return response.status(440).send("Error DELETE Request");
+      } else {
+        done();
+        return response.status(200).send("DELETE OK");
+      }
+    });
+  });
+});
+
 app.post('/add/request', function (request, response) {
   const results = [];
   var requestId = 0;
