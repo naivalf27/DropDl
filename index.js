@@ -137,7 +137,7 @@ app.post('/add/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ($1,\'$2\',\'$3\') RETURNING ID;', [message['type_id'],message['name'],message['comment']], function(err,result) {
+    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ($1,$2,$3) RETURNING ID;', [message['type_id'],message['name'],message['comment']], function(err,result) {
       if(err) {
         console.log('Error insert request : '+err);
         return response.status(440).send("Error insert Request");
