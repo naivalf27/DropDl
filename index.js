@@ -124,7 +124,7 @@ app.post('/up/request', function (request, response) {
   var requestId = 0;
   var message = {
         'user_id': request.body._user_id,
-        'request_id': request.body._type_id,
+        'request_id': request.body._request_id,
         'date':request.body._date
     };
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
@@ -137,7 +137,7 @@ app.post('/up/request', function (request, response) {
     // SQL Query > Insert Request
     client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']]);
     
-    const query = client.query('SELECT * FROM requests WHERE requests.ID=$1;',[requestId]);
+    const query = client.query('SELECT * FROM requests WHERE requests.ID=$1;',[message['request_id']]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
