@@ -186,30 +186,30 @@ app.get('/requests', function(request, response) {
 
 app.get('/requests/user', function(request, response) {
   const results = [];
-  var message = {
-        'user_id': request.body._user_id
-    };
+  // var message = {
+  //       'user_id': request.body._user_id
+  //   };
   console.log(request.url);
-  // Get a Postgres client from the connection pool
-  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
-    // Handle connection errors
-    if(err) {
-      done();
-      console.log(err);
-      return response.status(500).json({success: false, data: err});
-    }
-    // SQL Query > Select Data
-    const query = client.query('SELECT * FROM request_to_users, requests WHERE request_to_users.USER_ID = '+message['user_id']+' AND request_to_users.REQUEST_ID = requests.ID;');
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      return response.json(results);
-    });
-  });
+  // // Get a Postgres client from the connection pool
+  // pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+  //   // Handle connection errors
+  //   if(err) {
+  //     done();
+  //     console.log(err);
+  //     return response.status(500).json({success: false, data: err});
+  //   }
+  //   // SQL Query > Select Data
+  //   const query = client.query('SELECT * FROM request_to_users, requests WHERE request_to_users.USER_ID = '+message['user_id']+' AND request_to_users.REQUEST_ID = requests.ID;');
+  //   // Stream results back one row at a time
+  //   query.on('row', (row) => {
+  //     results.push(row);
+  //   });
+  //   // After all data is returned, close connection and return results
+  //   query.on('end', () => {
+  //     done();
+  //     return response.json(results);
+  //   });
+  // });
 });
 
 // Lancement de l'app
