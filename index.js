@@ -152,8 +152,7 @@ app.post('/down/request', function (request, response) {
   const results = [];
   var requestId = 0;
   var message = {
-        'user_id': request.body._user_id,
-        'request_id': request.body._request_id
+        'request_user_id': request.body._request_user_id
     };
   pg.connect(process.env.DATABASE_URL, (err, client, done) => {
     // Handle connection errors
@@ -163,7 +162,7 @@ app.post('/down/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    const query = client.query('DELETE FROM request_to_users WHERE request_to_users.USER_ID = $1 AND request_to_users.REQUEST_ID = $2;',[message['user_id'],message['request_id']], function(err,result) {
+    const query = client.query('DELETE FROM request_to_users WHERE request_to_users.ID = $1;',[message['request_user_id']], function(err,result) {
       if(err) {
         done();
         console.log('Error insert request : '+err);
