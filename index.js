@@ -135,17 +135,16 @@ app.post('/up/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']]);
-    
-    const query = client.query('SELECT * FROM requests WHERE requests.ID=$1;',[message['request_id']]);
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      return response.json(results[0]);
+    const query = client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']], function(err,result) {
+      if(err) {
+        done();
+        console.log('Error insert request : '+err);
+        return response.status(440).send("Error insert Request");
+      } else {
+        done();
+
+        return response.status(200).send("Insert OK");
+      }
     });
   });
 });
