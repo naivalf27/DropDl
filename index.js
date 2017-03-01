@@ -137,7 +137,7 @@ app.post('/add/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ('+message['type_id']+',\''+toHex(message['name'])+'\',\''+toHex(message['comment'])+'\') RETURNING ID;', [], function(err,result) {
+    const query1 = client.query('INSERT INTO requests (TYPE_ID,NAME,COMMENT) VALUES ($1,\'$2\',\'$3\') RETURNING ID;', [message['type_id'],message['name'],message['comment']], function(err,result) {
       if(err) {
         console.log('Error insert request : '+err);
         return response.status(440).send("Error insert Request");
@@ -173,8 +173,34 @@ app.get('/requests', function(request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    // SELECT A.*, (SELECT COUNT(*) FROM B WHERE B.a_id = A.id) AS TOT FROM A
     const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER FROM requests;');
+    // Stream results back one row at a time
+    query.on('row', (row) => {
+      results.push(row);
+    });
+    // After all data is returned, close connection and return results
+    query.on('end', () => {
+      done();
+      return response.json(results);
+    });
+  });
+});
+
+app.get('/requests/user', function(request, response) {
+  const results = [];
+  var message = {
+        'user_id': request.body._user_id
+    };
+  // Get a Postgres client from the connection pool
+  pg.connect(process.env.DATABASE_URL, (err, client, done) => {
+    // Handle connection errors
+    if(err) {
+      done();
+      console.log(err);
+      return response.status(500).json({success: false, data: err});
+    }
+    // SQL Query > Select Data
+    const query = client.query('SELECT * FROM request_to_users, requests WHERE request_to_users.USER_ID = '+message['user_id']+' AND request_to_users.REQUEST_ID = requests.ID;');
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
