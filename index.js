@@ -135,16 +135,37 @@ app.post('/up/request', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Request
-    const query = client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']], function(err,result) {
+    // const query = client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']], function(err,result) {
+    //   if(err) {
+    //     done();
+    //     console.log('Error insert request : '+err);
+    //     return response.status(440).send("Error insert Request");
+    //   } else {
+    //     done();
+    //     return response.status(200).send("Insert OK");
+    //   }
+    // });
+
+    const query1 = client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],message['request_id'],message['date']], function(err,result) {
       if(err) {
-        done();
         console.log('Error insert request : '+err);
         return response.status(440).send("Error insert Request");
       } else {
-        done();
-        return response.status(200).send("Insert OK");
+        requestId = result.rows[0].id;
+        const query = client.query('SELECT requests.*, (SELECT TRUE) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID AND requests.ID=$1;',[requestId]);
+        // Stream results back one row at a time
+        query.on('row', (row) => {
+          results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', () => {
+          done();
+          return response.json(results[0]);
+        });
       }
     });
+
+
   });
 });
 
@@ -201,7 +222,7 @@ app.post('/add/request', function (request, response) {
         requestId = result.rows[0].id;
         client.query('INSERT INTO request_to_users (USER_ID, REQUEST_ID, ASKED_AT) VALUES ($1,$2,$3);',[message['user_id'],requestId,message['date']]);
 
-        const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID AND requests.ID=$1;',[requestId]);
+        const query = client.query('SELECT requests.*, (SELECT TRUE) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID AND requests.ID=$1;',[requestId]);
         // Stream results back one row at a time
         query.on('row', (row) => {
           results.push(row);
