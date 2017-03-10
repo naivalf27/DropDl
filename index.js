@@ -227,7 +227,7 @@ app.get('/requests', function(request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID;');
+    const query = client.query('SELECT requests.*, (SELECT COUNT(*)==1 FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID AND request_to_users.USER_ID = $1) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID;',[request.query.user]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
@@ -251,7 +251,7 @@ app.get('/requests/user', function(request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Select Data
-    const query = client.query('SELECT requests.*, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM request_to_users, requests, types WHERE request_to_users.USER_ID = $1 AND request_to_users.REQUEST_ID = requests.ID AND requests.TYPE_ID=types.ID;',[request.query.user]);
+    const query = client.query('SELECT requests.*, (SELECT TRUE) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM request_to_users, requests, types WHERE request_to_users.USER_ID = $1 AND request_to_users.REQUEST_ID = requests.ID AND requests.TYPE_ID=types.ID;',[request.query.user]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
