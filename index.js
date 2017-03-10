@@ -151,8 +151,7 @@ app.post('/up/request', function (request, response) {
         console.log('Error insert request : '+err);
         return response.status(440).send("Error insert Request");
       } else {
-        requestId = result.rows[0].id;
-        const query = client.query('SELECT requests.*, (SELECT TRUE) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID AND requests.ID=$1;',[requestId]);
+        const query = client.query('SELECT requests.*, (SELECT TRUE) AS MY, (SELECT COUNT(*) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS NUMBER, (SELECT MIN(request_to_users.ASKED_AT) FROM request_to_users WHERE request_to_users.REQUEST_ID = requests.ID) AS ASKED_AT, types.NAME as TYPE_NAME FROM requests, types WHERE requests.TYPE_ID=types.ID AND requests.ID=$1;',[message['request_id']]);
         // Stream results back one row at a time
         query.on('row', (row) => {
           results.push(row);
