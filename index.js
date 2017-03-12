@@ -70,7 +70,7 @@ app.post('/add/user', function (request, response) {
     // SQL Query > Insert Data
     client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
 
-    const query = client.query('SELECT * FROM users ORDER BY id ASC;');
+    const query = client.query('SELECT * FROM users WHERE users.EMAIL=$1 ORDER BY id ASC;',[message['EMAIL']]);
     // Stream results back one row at a time
     query.on('row', (row) => {
       results.push(row);
@@ -78,7 +78,7 @@ app.post('/add/user', function (request, response) {
     // After all data is returned, close connection and return results
     query.on('end', () => {
       done();
-      return response.json(results);
+      return response.json(results[0]);
     });
   });
 });
