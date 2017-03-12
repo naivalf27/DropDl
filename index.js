@@ -68,17 +68,22 @@ app.post('/add/user', function (request, response) {
       return response.status(500).json({success: false, data: err});
     }
     // SQL Query > Insert Data
-    client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');');
-
-    const query = client.query('SELECT * FROM users WHERE users.EMAIL=$1 ORDER BY id ASC;',[message['EMAIL']]);
-    // Stream results back one row at a time
-    query.on('row', (row) => {
-      results.push(row);
-    });
-    // After all data is returned, close connection and return results
-    query.on('end', () => {
-      done();
-      return response.json(results[0]);
+    client.query('INSERT INTO users (NAME,PASSWORD,EMAIL) VALUES (\''+message['name']+'\',\''+message['password']+'\',\''+message['email']+'\');', function(err,result) {
+      if(err) {
+        console.log('Error insert request : '+err);
+        return response.status(440).send("Error insert Request");
+      } else {
+        const query = client.query('SELECT * FROM users WHERE users.EMAIL=$1 ORDER BY id ASC;',[message['EMAIL']]);
+        // Stream results back one row at a time
+        query.on('row', (row) => {
+          results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', () => {
+          done();
+          return response.json(results[0]);
+        });
+      }
     });
   });
 });
